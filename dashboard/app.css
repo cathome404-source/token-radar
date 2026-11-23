@@ -22,8 +22,14 @@ main, .top, footer { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
 .kpi-v { display: block; font-size: 15px; font-weight: 700; color: #f5b301; white-space: nowrap; }
 .kpi-l { display: block; color: #8b98ad; font-size: 12px; margin-top: 4px; }
 
-/* Lede + method */
+/* Lede + method + self-check */
 .lede { background: #111a2e; border-left: 3px solid #f5b301; padding: 16px; margin: 0 0 24px; }
+.selfcheck { background: #111a2e; border: 1px solid #243350; border-radius: 8px; padding: 16px; margin: 0 0 24px; }
+.selfcheck h2 { color: #f5b301; font-size: 18px; margin: 0 0 8px; }
+.selfcheck p { color: #c6cede; margin: 0 0 12px; }
+.selfcheck .valid { max-width: 100%; }
+.pass { color: #4ade80; font-weight: 700; }
+.fail { color: #f87171; font-weight: 700; }
 .method { margin: 32px 0; }
 .method h2 { color: #f5b301; font-size: 20px; margin: 0 0 12px; }
 .method h3 { font-size: 16px; margin: 24px 0 8px; }
@@ -32,6 +38,10 @@ main, .top, footer { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
 .valid { border-collapse: collapse; width: 100%; max-width: 640px; }
 .valid th, .valid td { border: 1px solid #243350; padding: 8px 12px; text-align: left; }
 .valid th { background: #16223c; }
+.valid.cand { max-width: 100%; font-size: 14px; }
+.valid.cand th, .valid.cand td { padding: 6px 10px; }
+.valid tr.kept td { background: rgba(74, 222, 128, 0.08); }
+.valid tr.kept td:first-child { font-weight: 700; }
 
 /* Controls */
 .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
@@ -68,6 +78,7 @@ table#board { border-collapse: collapse; width: 100%; background: #111a2e; }
 .mut { color: #8b98ad; }
 .valcell .v { font-weight: 700; }
 .valcell .range { color: #8b98ad; font-size: 12px; margin-top: 4px; }
+.rankrange { color: #8b98ad; font-size: 12px; display: block; margin-top: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .bar { height: 4px; background: #243350; border-radius: 2px; margin: 4px 0; min-width: 64px; }
 .bar > span { display: block; height: 100%; background: #f5b301; border-radius: 2px; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
@@ -100,6 +111,10 @@ table#board { border-collapse: collapse; width: 100%; background: #111a2e; }
 #d-body ol { margin: 0; padding-left: 20px; }
 #d-body ol li { margin-bottom: 12px; }
 .verdict-line { border-top: 1px solid #243350; padding-top: 16px; font-weight: 600; }
+.tier { border-collapse: collapse; width: 100%; margin: 0 0 16px; }
+.tier th, .tier td { border: 1px solid #243350; padding: 6px 10px; text-align: right; }
+.tier th { background: #16223c; text-align: left; }
+.tier td { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 footer { border-top: 1px solid #243350; padding-top: 16px; padding-bottom: 32px; color: #8b98ad; font-size: 13px; }
 

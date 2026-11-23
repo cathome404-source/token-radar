@@ -1,4 +1,4 @@
-// Token Radar's program: sealed snapshot in, ranked board + dashboard + dossier out.
+// Token Radar v2's program: sealed snapshot in, ranked board + dashboard + dossier out.
 //
 //   node main.ts --input <snapshot.json|directory> [--output <directory>]
 //
@@ -85,12 +85,17 @@ writeFileSync(
 );
 
 const top = board.filter((r) => r.token_status === 'pre-token').slice(0, 3);
+const bands = Object.entries(validation.bands.by_kind)
+  .map(([k, v]) => `${k} x${v.band}`)
+  .join(', ');
 process.stdout.write(
   `token radar: ${snapshot.protocols.length} protocols in the snapshot, ${snapshot.watchlist.length} on the watchlist\n` +
     `token radar: value curve log(mcap) = ${fit.intercept.toFixed(4)} + ${fit.slope.toFixed(4)} * log(TVL) on ${fit.n} comps (R2 ${fit.r2.toFixed(3)}); ` +
     `validation LOO x${validation.loo_median}, walk-forward x${validation.wf_median}, 10-fold x${validation.kfold_median}\n` +
-    `token radar: launch odds logistic b0=${launch.b0.toFixed(4)} b1=${launch.b1.toFixed(4)} b2=${launch.b2.toFixed(4)} on ${launch.n} protocols\n` +
+    `token radar: launch odds logistic b0=${launch.b0.toFixed(4)} b1=${launch.b1.toFixed(4)} b2=${launch.b2.toFixed(4)} on ${launch.dated_n} dated protocols ` +
+    `(median age ${launch.median_age_days}d for undated); 5-fold CV log-loss ${launch.cv_logloss}\n` +
+    `token radar: per-kind bands: ${bands}; sparse kinds use the global x${validation.bands.global}\n` +
     `token radar: board ${board.length} rows (${radar.counts.pre_token} pre-token, ${radar.counts.live} live, ${radar.counts.set_aside} set aside); ` +
-    `top pre-token ${top.map((r) => `${r.slug} $${r.implied_value_usd.toLocaleString('en-US')}`).join(', ')}\n` +
+    `top pre-token ${top.map((r) => `${r.slug} $${r.implied_value_usd.toLocaleString('en-US')} (#${r.pre_rank}, range #${r.rank_low}-${r.rank_high})`).join(', ')}\n` +
     `token radar: wrote board.json, data.js, dashboard/ (${dashFiles.length} files), screenshots/ (${shots.length} images) and dossier.json into ${outDir}\n`,
 );

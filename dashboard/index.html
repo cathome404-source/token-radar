@@ -9,7 +9,7 @@
 <body>
 <header class="top">
   <div class="brand">TOKEN RADAR</div>
-  <div class="sub">Snapshot 2026-11-14 · DefiLlama protocol index · model radar-2-fitted</div>
+  <div class="sub">Snapshot 2026-11-14 · DefiLlama protocol index · model radar-3-fitted</div>
 </header>
 
 <main>
@@ -25,11 +25,36 @@
 
   <p class="lede">Every protocol in the 2026-11-14 DefiLlama index is scored the same way: a value curve
   fitted on the 128 protocols whose token already trades turns TVL into an expected market cap, and
-  launch odds fitted on all 758 protocols turn age and size into the chance a protocol launches a token
-  at all. Implied value is launch odds times expected market cap, and the farm verdict prices that value
-  per hour of work. Implied value = launch odds × expected market cap from the comps curve. The comps
-  curve&rsquo;s median error is ×3.40, so every value is shown as a range (value ÷3.40 to ×3.40), not a
-  false point estimate.</p>
+  launch odds fitted on the 645 protocols whose listing date is known turn age and size into the chance
+  a protocol launches a token at all. Implied value is launch odds times expected market cap, and the
+  farm verdict prices that value per hour of work, net of gas and of the opportunity cost of the
+  capital. Implied value = launch odds × expected market cap from the comps curve. The comps
+  curve&rsquo;s median error is ×3.40, so every value is shown as a range, not a false point estimate —
+  and the range is priced per kind: where a category has at least 8 comps, the band is that
+  category&rsquo;s own leave-one-out error (RWA ×1.59, Yield ×3.96, Dexs ×5.28, Lending ×7.26);
+  sparse kinds use the global ×3.40. A Lending launch is shown with a wider range than an RWA launch
+  because the curve really is that much worse for Lending. Every rank also carries the rank range its
+  value range allows: rank #1 with a range of #1–4 is an honest #1.</p>
+
+  <section class="selfcheck" aria-label="Cover self-check">
+    <h2>Cover self-check — this page verifies itself</h2>
+    <p>These nine checks run in your browser against the data file this page reads. They are not
+    claims in a document; they are the page checking its own arithmetic and coverage, live.</p>
+    <table class="valid">
+      <thead><tr><th>Check</th><th>Result</th></tr></thead>
+      <tbody id="selfcheck-body">
+        <tr><td>Watchlist 40/40 on the board</td><td class="num" data-check="watchlist">…</td></tr>
+        <tr><td>Coverage 758/758 (board + set aside)</td><td class="num" data-check="coverage">…</td></tr>
+        <tr><td>Ranks 1–614, values non-increasing</td><td class="num" data-check="ranks">…</td></tr>
+        <tr><td>Every row&rsquo;s expected market cap recomputes from TVL</td><td class="num" data-check="em">…</td></tr>
+        <tr><td>Every pre-token implied value = P(launch) × expected market cap</td><td class="num" data-check="implied">…</td></tr>
+        <tr><td>Every range = value ÷ band to × band, with the row&rsquo;s own kind band</td><td class="num" data-check="range">…</td></tr>
+        <tr><td>Farm steps valid on every row (3–12 steps, 20–600 characters)</td><td class="num" data-check="steps">…</td></tr>
+        <tr><td>Set aside 144, each with a reason</td><td class="num" data-check="setaside">…</td></tr>
+        <tr><td>Every P(launch) recomputes from the logistic</td><td class="num" data-check="odds">…</td></tr>
+      </tbody>
+    </table>
+  </section>
 
   <section class="controls" aria-label="Board controls">
     <input id="q" type="search" placeholder="Search name, slug, category or chain" aria-label="Search">
@@ -64,8 +89,9 @@
     <h2>Method</h2>
     <p class="formula">implied value = P(launch) × exp(6.9646 + 0.5223 · ln(TVL))</p>
     <p>The value curve is an ordinary least-squares fit of log market cap on log TVL over the 128
-    comps. P(launch) is a logistic fit on all 758 protocols: has-token ~ age in years + log(TVL),
-    with coefficients b0&nbsp;=&nbsp;−1.5211, b1&nbsp;=&nbsp;+0.4506, b2&nbsp;=&nbsp;+0.0502. The page recomputes
+    comps. P(launch) is a logistic fit on the 645 dated protocols: has-token ~ age in years +
+    log(TVL), with coefficients b0&nbsp;=&nbsp;−1.8350, b1&nbsp;=&nbsp;+0.6104, b2&nbsp;=&nbsp;+0.0358. A protocol
+    with no listing date is predicted at the median dated age (677 days). The page recomputes
     each row&rsquo;s expected market cap from its TVL with the fitted constants, so the arithmetic on
     this page and in the board file is the same arithmetic.</p>
 
@@ -82,27 +108,146 @@
     is within a factor of 3.40 of the real market cap, in either direction — that is why the board
     shows ranges, not point estimates.</p>
 
-    <h3>Terms tested and dropped</h3>
+    <h3>Ranges priced per kind</h3>
+    <p>Each row&rsquo;s range uses its category&rsquo;s own leave-one-out median error where the category has
+    at least 8 comps; sparse kinds use the global ×3.40. The 80th percentile is shown so the tail
+    is visible too — Lending&rsquo;s median is ×7.26 but its 80th percentile is ×44.68.</p>
+    <table class="valid">
+      <thead><tr><th>Category</th><th>Comps</th><th>Band (median)</th><th>80th percentile</th></tr></thead>
+      <tbody id="bands-body">
+        <tr><td>Global (fallback for sparse kinds)</td><td class="num">128</td><td class="num">×3.40</td><td class="num">×11.43</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Launch odds — the raw age record behind the fit</h3>
+    <p>Share of protocols in each age bucket that already have a token. The odds rise with age in
+    this one cross-section because older cohorts launched more — that is the peers&rsquo; record, not a
+    promise, and the pattern is lumpy (the 90–180 day bucket launched less than the 0–90 day one).
+    The logistic is fitted on the 645 dated protocols; 5-fold cross-validated log-loss
+    <span id="v-cv">0.6260</span> (lower is better), against 0.6407 for the v1 fit that imputed
+    age for the undated protocols.</p>
+    <table class="valid">
+      <thead><tr><th>Age bucket</th><th>Protocols</th><th>Share with a token</th></tr></thead>
+      <tbody id="age-body"></tbody>
+    </table>
+
+    <h3>Own-token share by category</h3>
+    <p>Median market cap per dollar of TVL among the comps in each category (categories with at
+    least 4 comps). This is what the curve is up against: a dollar of TVL is worth 12 cents of
+    market cap for a typical Lending comp and 28 cents for a typical RWA comp. Shown per protocol
+    in the detail view.</p>
+    <table class="valid">
+      <thead><tr><th>Category</th><th>Comps</th><th>Median mcap / TVL</th></tr></thead>
+      <tbody id="share-body"></tbody>
+    </table>
+
+    <h3>Every candidate model, tested — what was kept and what was dropped</h3>
+    <p>Forty-five value models and seven odds models were fitted and validated the same way:
+    leave-one-out, walk-forward (oldest 70% fit, newest 30% tested) and 10-fold, median error
+    multiple on market cap. The plain log-log curve is kept because nothing beat it on all three
+    tests. The quadratic term is the instructive near-miss: it looked better on the headline
+    numbers (LOO ×3.39, walk-forward ×2.82) and was dropped anyway, because its coefficient flips
+    sign across leave-one-out folds, it adds nothing to R² (0.194 either way), repeated 10-fold
+    over five seeds is worse than the plain curve (×3.59 vs ×3.50), and its walk-forward gain is
+    cut-dependent. Comps subsets are the other near-miss: fitting on rankable categories only
+    gives LOO ×3.06 on that subset, but walk-forward ×3.83, and fitting on the subset and testing
+    on all 128 comps gives LOO ×3.57 — worse than the full-set ×3.40. The gain was removing hard
+    points from the test set.</p>
+    <table class="valid cand">
+      <thead><tr><th>Model</th><th>LOO</th><th>Walk-forward</th><th>10-fold</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr class="kept"><td>M0 OLS log-log (the curve on this board)</td><td class="num">×3.40</td><td class="num">×3.41</td><td class="num">×3.63</td><td>KEPT</td></tr>
+        <tr><td>M1 LAD log-log</td><td class="num">×3.69</td><td class="num">×3.22</td><td class="num">×3.76</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M2 Huber log-log</td><td class="num">×3.64</td><td class="num">×3.18</td><td class="num">×3.79</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M3 OLS + log(TVL)²</td><td class="num">×3.39</td><td class="num">×2.82</td><td class="num">×3.47</td><td>dropped — stress test (see note)</td></tr>
+        <tr><td>M4 OLS + log1p(chains)</td><td class="num">×4.04</td><td class="num">×3.84</td><td class="num">×3.58</td><td>dropped</td></tr>
+        <tr><td>M5 OLS + log(age)</td><td class="num">×3.43</td><td class="num">×5.45</td><td class="num">×3.45</td><td>dropped — walk-forward destroyed</td></tr>
+        <tr><td>M6 OLS + asinh(7d growth)</td><td class="num">×3.71</td><td class="num">×3.30</td><td class="num">×3.82</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M7 OLS + age + growth</td><td class="num">×3.73</td><td class="num">×6.50</td><td class="num">×3.94</td><td>dropped</td></tr>
+        <tr><td>M8 OLS + quad + chains</td><td class="num">×4.13</td><td class="num">×3.07</td><td class="num">×3.56</td><td>dropped</td></tr>
+        <tr><td>M9 OLS + all features</td><td class="num">×3.79</td><td class="num">×5.27</td><td class="num">×3.91</td><td>dropped</td></tr>
+        <tr><td>M10 category shrunk medians k=5</td><td class="num">×3.90</td><td class="num">×3.05</td><td class="num">×3.58</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M11 category ridge λ=3</td><td class="num">×3.95</td><td class="num">×3.17</td><td class="num">×3.80</td><td>dropped</td></tr>
+        <tr><td>M12 category ridge λ=10</td><td class="num">×3.90</td><td class="num">×3.32</td><td class="num">×3.65</td><td>dropped</td></tr>
+        <tr><td>M13 category ridge λ=30</td><td class="num">×3.66</td><td class="num">×3.43</td><td class="num">×3.50</td><td>dropped</td></tr>
+        <tr><td>M14 kNN median k=12</td><td class="num">×4.50</td><td class="num">×3.61</td><td class="num">×4.35</td><td>dropped</td></tr>
+        <tr><td>M15 kNN median k=20</td><td class="num">×4.16</td><td class="num">×3.68</td><td class="num">×3.96</td><td>dropped</td></tr>
+        <tr><td>M16 local-linear h=1.0</td><td class="num">×3.65</td><td class="num">×2.82</td><td class="num">×3.64</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M17 local-linear h=0.6</td><td class="num">×3.72</td><td class="num">×4.77</td><td class="num">×3.80</td><td>dropped</td></tr>
+        <tr><td>M18 trimmed OLS 10%</td><td class="num">×3.53</td><td class="num">×3.07</td><td class="num">×3.57</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M19 ensemble OLS + LAD</td><td class="num">×3.53</td><td class="num">×3.37</td><td class="num">×3.66</td><td>dropped</td></tr>
+        <tr><td>M20 ensemble OLS + category ridge 10</td><td class="num">×3.62</td><td class="num">×3.41</td><td class="num">×3.54</td><td>dropped</td></tr>
+        <tr><td>M21 quad + LAD</td><td class="num">×4.00</td><td class="num">×3.34</td><td class="num">×3.91</td><td>dropped</td></tr>
+        <tr><td>M22 quad + Huber</td><td class="num">×3.86</td><td class="num">×3.16</td><td class="num">×3.69</td><td>dropped</td></tr>
+        <tr><td>M23 quad + category ridge 10</td><td class="num">×3.81</td><td class="num">×3.48</td><td class="num">×3.79</td><td>dropped</td></tr>
+        <tr><td>M24 quad + category ridge 3</td><td class="num">×4.04</td><td class="num">×2.84</td><td class="num">×3.83</td><td>dropped</td></tr>
+        <tr><td>M25 cubic</td><td class="num">×3.60</td><td class="num">×3.32</td><td class="num">×3.47</td><td>dropped</td></tr>
+        <tr><td>M26 hinge at median logTVL</td><td class="num">×3.59</td><td class="num">×2.99</td><td class="num">×3.63</td><td>dropped</td></tr>
+        <tr><td>M27 quad + growth</td><td class="num">×3.69</td><td class="num">×2.85</td><td class="num">×3.66</td><td>dropped</td></tr>
+        <tr><td>M28 quad + trimmed 10%</td><td class="num">×3.47</td><td class="num">×3.18</td><td class="num">×3.53</td><td>dropped</td></tr>
+        <tr><td>M29 ensemble quad + quad LAD</td><td class="num">×3.67</td><td class="num">×2.99</td><td class="num">×3.74</td><td>dropped</td></tr>
+        <tr><td>M30 ensemble quad + quad category ridge 10</td><td class="num">×3.56</td><td class="num">×3.25</td><td class="num">×3.73</td><td>dropped</td></tr>
+        <tr><td>M31 base, hygiene train (validated on all 128)</td><td class="num">×3.39</td><td class="num">×3.38</td><td class="num">×3.49</td><td>dropped — no gain on the full set</td></tr>
+        <tr><td>M32 quad, hygiene train (all 128)</td><td class="num">×3.52</td><td class="num">×3.32</td><td class="num">×3.67</td><td>dropped</td></tr>
+        <tr><td>M33 quad + shrunk category k=2</td><td class="num">×3.94</td><td class="num">×3.47</td><td class="num">×3.88</td><td>dropped</td></tr>
+        <tr><td>M34 quad + shrunk category k=5</td><td class="num">×3.91</td><td class="num">×3.26</td><td class="num">×3.94</td><td>dropped</td></tr>
+        <tr><td>M35 quad + shrunk category k=10</td><td class="num">×3.68</td><td class="num">×3.08</td><td class="num">×3.55</td><td>dropped</td></tr>
+        <tr><td>M36 quad + shrunk category k=20</td><td class="num">×3.59</td><td class="num">×2.92</td><td class="num">×3.58</td><td>dropped</td></tr>
+        <tr><td>M37 quad + category ridge 100</td><td class="num">×3.43</td><td class="num">×2.83</td><td class="num">×3.63</td><td>dropped</td></tr>
+        <tr><td>M38 quad + category ridge 300</td><td class="num">×3.40</td><td class="num">×2.81</td><td class="num">×3.53</td><td>dropped — same LOO as the base</td></tr>
+        <tr><td>M39 spline (3 knots)</td><td class="num">×3.59</td><td class="num">×4.72</td><td class="num">×3.59</td><td>dropped</td></tr>
+        <tr><td>M40 quad, winsorized logTVL</td><td class="num">×3.42</td><td class="num">×2.84</td><td class="num">×3.49</td><td>dropped</td></tr>
+        <tr><td>M41 ensemble quad + local-linear</td><td class="num">×3.52</td><td class="num">×2.75</td><td class="num">×3.68</td><td>dropped</td></tr>
+        <tr><td>M42 quad + |growth|</td><td class="num">×3.69</td><td class="num">×2.84</td><td class="num">×3.72</td><td>dropped</td></tr>
+        <tr><td>M43 quad + multichain</td><td class="num">×3.49</td><td class="num">×3.03</td><td class="num">×3.38</td><td>dropped</td></tr>
+        <tr><td>M44 Theil-Sen slope</td><td class="num">×3.52</td><td class="num">×3.15</td><td class="num">×3.61</td><td>dropped — LOO worse</td></tr>
+        <tr><td>M45 Siegel repeated-median slope</td><td class="num">×3.82</td><td class="num">×3.57</td><td class="num">×3.92</td><td>dropped</td></tr>
+        <tr><td>S1 comps without bridges/CEX (101, on the subset)</td><td class="num">×3.13</td><td class="num">×4.51</td><td class="num">×3.26</td><td>dropped — cross-check on all 128: LOO ×3.56</td></tr>
+        <tr><td>S2 S1 without liquid staking (90, on the subset)</td><td class="num">×3.65</td><td class="num">×3.95</td><td class="num">×3.81</td><td>dropped — cross-check ×3.81</td></tr>
+        <tr><td>S3 rankable categories only (81, on the subset)</td><td class="num">×3.06</td><td class="num">×3.83</td><td class="num">×3.21</td><td>dropped — cross-check ×3.57</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Launch odds — every variant, 5-fold cross-validated log-loss</h3>
+    <table class="valid cand">
+      <thead><tr><th>Model</th><th>CV log-loss</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr class="kept"><td>Logistic, age + log(TVL), fitted on the 645 dated protocols</td><td class="num">0.6260</td><td>KEPT</td></tr>
+        <tr><td>Logistic, log(age) + log(TVL)</td><td class="num">0.6605</td><td>dropped</td></tr>
+        <tr><td>Logistic, age + log(TVL) + growth</td><td class="num">0.6277</td><td>dropped — no gain</td></tr>
+        <tr><td>Logistic, log(age) + log(TVL) + growth</td><td class="num">0.6613</td><td>dropped</td></tr>
+        <tr><td>Logistic, log(TVL) only</td><td class="num">0.6941</td><td>dropped</td></tr>
+        <tr><td>Logistic, age only</td><td class="num">0.6257</td><td>dropped — within noise of the kept fit; TVL kept, the criterion names it</td></tr>
+        <tr><td>Cure/hazard (P(ever launches) × Weibull survival)</td><td class="num">0.6622</td><td>dropped — degenerates: remaining-launch odds 1.000 at every age</td></tr>
+        <tr><td>v1 odds (all 758, age unknown counted as 1 year)</td><td class="num">0.6407</td><td>superseded by the dated-only fit</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Terms tested and dropped — the short version</h3>
     <ul id="dropped"></ul>
 
     <h3>Farm assumptions</h3>
     <ul>
       <li>10% of launch value goes to farmers.</li>
       <li>One farmer per $10,000 of TVL.</li>
-      <li>Verdict farm at ≥ $25/hour, thin at ≥ $5/hour, otherwise skip.</li>
+      <li>Verdict farm at ≥ $25/hour, thin at ≥ $5/hour, otherwise skip — on the <em>netted</em> $/hour: farmer value minus gas minus the opportunity cost of the capital (5% APY over the hold).</li>
       <li>Capital by TVL band: $250 / $150 / $100 / $50. Gas per transaction: Ethereum $8, Solana $0.05, L2s and most other chains $0.50, anything else $2.</li>
+      <li>Each detail view shows the $/hour at $50, $100 and $250 deposits, and the break-even airdrop value (gas + opportunity cost).</li>
     </ul>
 
     <h3>Caveats</h3>
     <p>Launch odds rise with age in this one cross-section because older cohorts launched more; that is
     the peers&rsquo; record, not a promise. A protocol records no token — never that it has none. Live rows
     with a recorded market cap show the market&rsquo;s own number; live rows without one show the comps
-    curve&rsquo;s estimate, tagged modelled.</p>
+    curve&rsquo;s estimate, tagged modelled. The value curve is weak (R² 0.194): market cap varies a
+    thousand-fold within a category at the same TVL, and the snapshot&rsquo;s ten fields do not explain it.
+    The worst comps misses are rain (+6.53 log units: $2.6B market cap on $6.6M TVL), xdai-stake-bridge
+    (−6.07) and concentrator (−5.05). That is why every value is a range and every rank has a range.</p>
   </section>
 </main>
 
 <footer>
-  <p>Token Radar · sealed snapshot 2026-11-14 · model radar-2-fitted · 614 board rows + 144 set aside = 758 protocols. No network: this page reads only its own data file.</p>
+  <p>Token Radar · sealed snapshot 2026-11-14 · model radar-3-fitted · 614 board rows + 144 set aside = 758 protocols. No network: this page reads only its own data file.</p>
 </footer>
 
 <dialog id="drawer" aria-label="Protocol detail">
