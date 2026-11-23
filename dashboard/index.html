@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — which pre-token protocols are worth farming</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">TOKEN RADAR</div>
+  <div class="sub">Snapshot 2026-11-14 · DefiLlama protocol index · model radar-2-fitted</div>
+</header>
+
+<main>
+  <!-- Integrity strip: six facts, always visible. Values are re-filled from data.js by app.js. -->
+  <section class="kpis" aria-label="Integrity strip">
+    <div class="kpi"><span class="kpi-v" id="kpi-watch">40/40</span><span class="kpi-l">Watchlist</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-board">614 rows</span><span class="kpi-l">Board · 198 pre-token + 416 live</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-cover">758/758</span><span class="kpi-l">Protocols accounted for</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-loo">LOO ×3.40</span><span class="kpi-l">Leave-one-out median error</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-wf">Walk-forward ×3.41</span><span class="kpi-l">Walk-forward median error</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-comps">n=128, R² 0.194</span><span class="kpi-l">Comps in the value curve</span></div>
+  </section>
+
+  <p class="lede">Every protocol in the 2026-11-14 DefiLlama index is scored the same way: a value curve
+  fitted on the 128 protocols whose token already trades turns TVL into an expected market cap, and
+  launch odds fitted on all 758 protocols turn age and size into the chance a protocol launches a token
+  at all. Implied value is launch odds times expected market cap, and the farm verdict prices that value
+  per hour of work. Implied value = launch odds × expected market cap from the comps curve. The comps
+  curve&rsquo;s median error is ×3.40, so every value is shown as a range (value ÷3.40 to ×3.40), not a
+  false point estimate.</p>
+
+  <section class="controls" aria-label="Board controls">
+    <input id="q" type="search" placeholder="Search name, slug, category or chain" aria-label="Search">
+    <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+    <select id="vd" aria-label="Verdict">
+      <option value="all">All verdicts</option>
+      <option value="farm">farm</option>
+      <option value="thin">thin</option>
+      <option value="skip">skip</option>
+      <option value="live">live</option>
+    </select>
+    <div class="tabs" role="tablist" aria-label="Board tabs">
+      <button id="tab-pre" role="tab" data-tab="pre">Pre-token <span class="cnt" id="cnt-pre">198</span></button>
+      <button id="tab-live" role="tab" data-tab="live">Live <span class="cnt" id="cnt-live">416</span></button>
+      <button id="tab-setaside" role="tab" data-tab="setaside">Set aside <span class="cnt" id="cnt-set">144</span></button>
+    </div>
+    <p id="count" class="count" aria-live="polite"></p>
+  </section>
+
+  <section class="board">
+    <div class="tablewrap">
+      <table id="board">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p id="empty" class="empty" hidden>No rows match these filters.</p>
+    <p class="hint">Click a row (or press Enter on it) for the model breakdown and the costed farm plan.</p>
+  </section>
+
+  <section class="method" aria-label="Method">
+    <h2>Method</h2>
+    <p class="formula">implied value = P(launch) × exp(6.9646 + 0.5223 · ln(TVL))</p>
+    <p>The value curve is an ordinary least-squares fit of log market cap on log TVL over the 128
+    comps. P(launch) is a logistic fit on all 758 protocols: has-token ~ age in years + log(TVL),
+    with coefficients b0&nbsp;=&nbsp;−1.5211, b1&nbsp;=&nbsp;+0.4506, b2&nbsp;=&nbsp;+0.0502. The page recomputes
+    each row&rsquo;s expected market cap from its TVL with the fitted constants, so the arithmetic on
+    this page and in the board file is the same arithmetic.</p>
+
+    <h3>Validation — out of sample, median error multiple</h3>
+    <table class="valid">
+      <thead><tr><th>Test</th><th>Median</th><th>Geometric mean</th></tr></thead>
+      <tbody>
+        <tr><td>Leave-one-out</td><td class="num" id="v-loo-m">×3.40</td><td class="num" id="v-loo-g">×4.93</td></tr>
+        <tr><td>Walk-forward (oldest 70% fit, newest 30% tested)</td><td class="num" id="v-wf-m">×3.41</td><td class="num" id="v-wf-g">×5.47</td></tr>
+        <tr><td>10-fold</td><td class="num" id="v-kf-m">×3.63</td><td class="num" id="v-kf-g">×4.92</td></tr>
+      </tbody>
+    </table>
+    <p>Comps n&nbsp;=&nbsp;<span id="v-n">128</span>. A multiple of ×3.40 means the typical comps prediction
+    is within a factor of 3.40 of the real market cap, in either direction — that is why the board
+    shows ranges, not point estimates.</p>
+
+    <h3>Terms tested and dropped</h3>
+    <ul id="dropped"></ul>
+
+    <h3>Farm assumptions</h3>
+    <ul>
+      <li>10% of launch value goes to farmers.</li>
+      <li>One farmer per $10,000 of TVL.</li>
+      <li>Verdict farm at ≥ $25/hour, thin at ≥ $5/hour, otherwise skip.</li>
+      <li>Capital by TVL band: $250 / $150 / $100 / $50. Gas per transaction: Ethereum $8, Solana $0.05, L2s and most other chains $0.50, anything else $2.</li>
+    </ul>
+
+    <h3>Caveats</h3>
+    <p>Launch odds rise with age in this one cross-section because older cohorts launched more; that is
+    the peers&rsquo; record, not a promise. A protocol records no token — never that it has none. Live rows
+    with a recorded market cap show the market&rsquo;s own number; live rows without one show the comps
+    curve&rsquo;s estimate, tagged modelled.</p>
+  </section>
+</main>
+
+<footer>
+  <p>Token Radar · sealed snapshot 2026-11-14 · model radar-2-fitted · 614 board rows + 144 set aside = 758 protocols. No network: this page reads only its own data file.</p>
+</footer>
+
+<dialog id="drawer" aria-label="Protocol detail">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-rank" id="d-rank"></div>
+      <h2 id="d-name"></h2>
+      <div class="drawer-sub" id="d-sub"></div>
+    </div>
+    <button id="d-close" class="close" aria-label="Close detail">✕</button>
+  </div>
+  <div id="d-body"></div>
+</dialog>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+/* Token Radar — dark terminal theme. Palette: canvas #0a0f1e, surface #111a2e,
+   surface-2 #16223c, ink #e8ecf4, muted #8b98ad, border #243350, amber #f5b301,
+   live teal #2dd4bf, negative #f87171, positive #4ade80. Spacing 4/8/12/16/24/32. */
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0; background: #0a0f1e; color: #e8ecf4;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.5;
+}
+main, .top, footer { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+.num, td.num, .kpi-v, .formula, .valcell .v { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* Header */
+.top { padding-top: 24px; padding-bottom: 16px; border-bottom: 1px solid #243350; }
+.brand { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #f5b301; }
+.sub { color: #8b98ad; margin-top: 4px; }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 24px 0; }
+.kpi { background: #111a2e; border: 1px solid #243350; border-radius: 8px; padding: 12px 10px; }
+.kpi-v { display: block; font-size: 15px; font-weight: 700; color: #f5b301; white-space: nowrap; }
+.kpi-l { display: block; color: #8b98ad; font-size: 12px; margin-top: 4px; }
+
+/* Lede + method */
+.lede { background: #111a2e; border-left: 3px solid #f5b301; padding: 16px; margin: 0 0 24px; }
+.method { margin: 32px 0; }
+.method h2 { color: #f5b301; font-size: 20px; margin: 0 0 12px; }
+.method h3 { font-size: 16px; margin: 24px 0 8px; }
+.method p, .method li { color: #c6cede; }
+.formula { background: #16223c; border: 1px solid #243350; border-radius: 8px; padding: 12px 16px; color: #e8ecf4; font-size: 16px; overflow-x: auto; }
+.valid { border-collapse: collapse; width: 100%; max-width: 640px; }
+.valid th, .valid td { border: 1px solid #243350; padding: 8px 12px; text-align: left; }
+.valid th { background: #16223c; }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+.controls input, .controls select {
+  background: #111a2e; color: #e8ecf4; border: 1px solid #243350; border-radius: 8px;
+  padding: 8px 12px; font: inherit;
+}
+.controls input { flex: 1 1 280px; }
+.controls input:focus, .controls select:focus, button:focus-visible, tr:focus-visible { outline: 2px solid #f5b301; outline-offset: 1px; }
+.tabs { display: flex; gap: 8px; }
+.tabs button {
+  background: #111a2e; color: #8b98ad; border: 1px solid #243350; border-radius: 8px;
+  padding: 8px 12px; font: inherit; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: #f5b301; color: #0a0f1e; border-color: #f5b301; font-weight: 700; }
+.tabs .cnt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+.count { color: #8b98ad; margin: 0; flex-basis: 100%; }
+
+/* Board table */
+.board { margin-bottom: 8px; }
+.tablewrap { overflow-x: auto; border: 1px solid #243350; border-radius: 8px; }
+table#board { border-collapse: collapse; width: 100%; background: #111a2e; }
+#board th, #board td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #243350; vertical-align: top; }
+#board thead th { background: #16223c; position: sticky; top: 0; white-space: nowrap; }
+#board th.sortable { cursor: pointer; }
+#board th.sortable:hover { color: #f5b301; }
+#board tbody tr { cursor: pointer; }
+#board tbody tr:hover, #board tbody tr:focus-visible { background: #16223c; }
+#board td.num, #board th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.name { font-weight: 600; }
+.meta { color: #8b98ad; font-size: 12px; margin-top: 4px; }
+.pos { color: #4ade80; }
+.neg { color: #f87171; }
+.mut { color: #8b98ad; }
+.valcell .v { font-weight: 700; }
+.valcell .range { color: #8b98ad; font-size: 12px; margin-top: 4px; }
+.bar { height: 4px; background: #243350; border-radius: 2px; margin: 4px 0; min-width: 64px; }
+.bar > span { display: block; height: 100%; background: #f5b301; border-radius: 2px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.badge.farm { background: #4ade80; color: #0a0f1e; }
+.badge.thin { background: #f5b301; color: #0a0f1e; }
+.badge.skip { background: #f87171; color: #0a0f1e; }
+.badge.live { background: #2dd4bf; color: #0a0f1e; }
+.tag { display: inline-block; padding: 1px 6px; border: 1px solid #2dd4bf; color: #2dd4bf; border-radius: 4px; font-size: 11px; margin-left: 8px; }
+.perh { color: #8b98ad; font-size: 12px; display: block; margin-top: 4px; }
+.empty { color: #8b98ad; padding: 24px; text-align: center; }
+.hint { color: #8b98ad; font-size: 13px; }
+
+/* Detail drawer: a dialog sliding in from the right */
+#drawer {
+  margin: 0 0 0 auto; height: 100%; max-height: 100%; width: min(520px, 94vw);
+  background: #111a2e; color: #e8ecf4; border: none; border-left: 1px solid #243350; padding: 0;
+}
+#drawer::backdrop { background: rgba(4, 7, 14, 0.6); }
+.drawer-head { display: flex; justify-content: space-between; gap: 12px; padding: 16px 24px; border-bottom: 1px solid #243350; position: sticky; top: 0; background: #111a2e; }
+.drawer-head h2 { margin: 4px 0; font-size: 20px; }
+.drawer-rank { color: #f5b301; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+.drawer-sub { color: #8b98ad; font-size: 13px; }
+.close { background: #16223c; color: #e8ecf4; border: 1px solid #243350; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; flex: none; }
+#d-body { padding: 16px 24px 24px; }
+#d-body dl { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; margin: 0 0 16px; }
+#d-body dt { color: #8b98ad; }
+#d-body dd { margin: 0; text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.recompute { background: #16223c; border: 1px solid #243350; border-radius: 8px; padding: 12px; font-size: 14px; }
+#d-body h3 { font-size: 15px; margin: 24px 0 8px; color: #f5b301; }
+#d-body ol { margin: 0; padding-left: 20px; }
+#d-body ol li { margin-bottom: 12px; }
+.verdict-line { border-top: 1px solid #243350; padding-top: 16px; font-weight: 600; }
+
+footer { border-top: 1px solid #243350; padding-top: 16px; padding-bottom: 32px; color: #8b98ad; font-size: 13px; }
+
+@media (max-width: 900px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  main, .top, footer { padding-left: 12px; padding-right: 12px; }
+}
